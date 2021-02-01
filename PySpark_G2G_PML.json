@@ -1,0 +1,87 @@
+[
+        {
+            "description": "Elatic batch Input G2G",
+            "type": "elastic_batch_input",
+            "component": "input",
+            "publish": [{"stream": "data"}],
+            "settings": {
+                "index": "winlogbeat-6.4.3-2019.02.07",
+                "type": "doc",
+                "cluster_name": "es_search",
+                "query": {"bool": {
+                    "must": [
+                      {
+                        "match_phrase": {
+                          "log_name": {
+                            "query": "Microsoft-Windows-Sysmon/Operational"
+                          }
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "task": {
+                            "query": "Process Create (rule: ProcessCreate)"
+                          }
+                        }
+                      }
+                    ]
+                }},
+                "nodes": [
+                    "localhost"
+                ],
+                "port": 9200,
+                "elastic_settings": {
+                    "es.index.read.missing.as.empty": "no"
+                },
+                "column_source": "source",
+                "output_fields": [
+                    {
+                        "type": "string",
+                        "json_field": "event_data.CurrentDirectory",
+                        "dataset_column": "CurrentDirectory"
+                    },
+                    {
+                        "type": "string",
+                        "json_field": "event_data.CommandLine",
+                        "dataset_column": "CommandLine"
+                    },
+                    {
+                        "type" : "string",
+                        "json_field" : "computer_name",
+                        "dataset_column" : "computer_name"
+                    },
+                    {
+                        "type" : "string",
+                        "json_field" : "@timestamp",
+                        "dataset_column" : "Date"
+                    }
+                ]
+            }
+        },
+        {
+        "description" : "DBSCAN algorithm",
+        "type" : "categorical_dbscan",
+        "component" : "model",
+        "settings" : {
+            "features" : [
+                "CommandLine"
+            ],
+            "epsilon" : 1.9,
+            "minPoints" : 5
+            },
+            "subscribe": [{"component": "input", "stream": "data"}],
+            "publish": [{"stream": "data_model"}]
+        },
+
+        {
+            "type": "elastic_batch_output",
+            "component": "output",
+            "subscribe": [{"component": "model", "stream": "data_model"}],
+            "settings": {
+                "input_fields": ["Date", "computer_name","CurrentDirectory", "CommandLine", "cluster"],
+                "index": "gdeuxg-attack",
+                "nodes":["localhost"],
+                "type": "doc",
+                }
+        }
+]

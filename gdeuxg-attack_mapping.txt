@@ -1,0 +1,43 @@
+PUT gdeuxg-attack
+{
+  "mappings": {
+    "doc": {
+      "properties": {
+        "CommandLine": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "CurrentDirectory": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "Date": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss.SSS||yyyy-MM-dd HH:mm:ss||epoch_millis"
+        },
+        "cluster": {
+          "type": "float"
+        },
+        "computer_name": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        }
+      }
+    }
+  }
+}
